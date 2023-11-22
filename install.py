@@ -4,6 +4,7 @@ import os
 import sys
 import argparse
 
+
 def find_service_file(directory: str) -> str:
     directory_path = os.path.abspath(directory)
     if not os.path.exists(directory_path):
@@ -19,7 +20,8 @@ def find_service_file(directory: str) -> str:
         sys.exit(1)
     return service_file
 
-def install_systemd_service(directory:str, enable: bool):
+
+def install_systemd_service(directory: str, enable: bool):
     service_file = find_service_file(directory)
     service_name = os.path.splitext(os.path.basename(service_file))[0]
     systemd_path = f"/etc/systemd/system/{service_name}.service"
@@ -36,6 +38,7 @@ def install_systemd_service(directory:str, enable: bool):
         print(f"Systemd service '{service_name}' enabled, and started successfully.")
     sys.exit(0)
 
+
 def uninstall_systemd_service(directory: str):
     service_file = find_service_file(directory)
     service_name = os.path.splitext(os.path.basename(service_file))[0]
@@ -48,10 +51,12 @@ def uninstall_systemd_service(directory: str):
     print(f"Systemd service '{service_name}' uninstalled successfully.")
     sys.exit(0)
 
+
 def issudo():
     if os.geteuid() != 0:
         print("This script must be run as root.")
         sys.exit(1)
+
 
 def ensure_810_led_installed():
     if not os.path.exists("/lib/systemd/system/g810-led-reboot.service"):
@@ -59,11 +64,18 @@ def ensure_810_led_installed():
         print("sudo apt install g810-led")
         sys.exit(1)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("directory", help="Path to the directory containing the service file")
-    parser.add_argument("--uninstall", action="store_true", help="Uninstall the service")
-    parser.add_argument("--enable", action="store_true", help="Start the service on boot")
+    parser.add_argument(
+        "directory", help="Path to the directory containing the service file"
+    )
+    parser.add_argument(
+        "--uninstall", action="store_true", help="Uninstall the service"
+    )
+    parser.add_argument(
+        "--enable", action="store_true", help="Start the service on boot"
+    )
     args = parser.parse_args()
     issudo()
 
