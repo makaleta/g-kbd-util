@@ -2,9 +2,9 @@
 Description=Dim keyboard LEDs
 
 [Service]
-Type=oneshot
-ExecStart=/opt/g513-led/setup.sh
-RemainAfterExit=true
+Type=simple
+ExecStart=/opt/g513-led/setup.py
+Restart=on-abnormal
 ExecStop=/opt/g513-led/teardown.sh
 StandardOutput=journal
 

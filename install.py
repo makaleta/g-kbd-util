@@ -26,7 +26,7 @@ def install_systemd_service(directory:str, enable: bool):
     os.system(f"cp {service_file} {systemd_path}")
     os.makedirs(f"/opt/{service_name}", exist_ok=True)
     for file in os.listdir(directory):
-        if file.endswith(".sh"):
+        if file.endswith(".sh") or file.endswith(".py"):
             os.system(f"cp {os.path.join(directory, file)} /opt/{service_name}")
     os.system("systemctl daemon-reload")
     print(f"Systemd service '{service_name}' installed successfully.")
