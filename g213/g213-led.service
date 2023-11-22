@@ -1,0 +1,12 @@
+[Unit]
+Description=Dim keyboard LEDs
+
+[Service]
+Type=oneshot
+ExecStart=/opt/g213-led/setup.sh
+RemainAfterExit=true
+ExecStop=/opt/g213-led/teardown.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
