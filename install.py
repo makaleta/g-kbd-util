@@ -21,35 +21,69 @@ def find_service_file(directory: str) -> str:
     return service_file
 
 
+def paths(service_name, is_user=False):
+    if is_user:
+        return {
+            "service": f"/etc/systemd/user/{service_name}.service",
+            "files": f"/usr/local/etc/{service_name}",
+        }
+    else:
+        return {
+            "service": f"/etc/systemd/system/{service_name}.service",
+            "files": f"/opt/{service_name}",
+        }
+
+def install_service(service_file: str, directory: str, paths: dict):
+    os.system(f"cp {service_file} {paths['service']}")
+    os.makedirs(f"{paths['files']}", exist_ok=True)
+    for file in os.listdir(directory):
+        if file.endswith(".sh") or file.endswith(".py"):
+            os.system(f"cp {os.path.join(directory, file)} {paths['files']}")
+
 def install_systemd_service(directory: str, enable: bool):
     service_file = find_service_file(directory)
     service_name = os.path.splitext(os.path.basename(service_file))[0]
-    systemd_path = f"/etc/systemd/system/{service_name}.service"
-    os.system(f"cp {service_file} {systemd_path}")
-    os.makedirs(f"/opt/{service_name}", exist_ok=True)
-    for file in os.listdir(directory):
-        if file.endswith(".sh") or file.endswith(".py"):
-            os.system(f"cp {os.path.join(directory, file)} /opt/{service_name}")
+    cpaths = paths(service_name)
+    install_service(service_file, directory, cpaths)
     os.system("systemctl daemon-reload")
     print(f"Systemd service '{service_name}' installed successfully.")
     if enable:
         os.system(f"systemctl enable {service_name}")
         os.system(f"systemctl restart {service_name}")
         print(f"Systemd service '{service_name}' enabled, and started successfully.")
-    sys.exit(0)
+
+def install_systemd_user_service(directory: str, enable: bool):
+    service_file = find_service_file(directory)
+    service_name = os.path.splitext(os.path.basename(service_file))[0]
+    cpaths = paths(service_name, True)
+    install_service(service_file, directory, cpaths)
+    print(f"Systemd user service '{service_name}' installed successfully.")
+    if enable:
+        print("user service not enabled, run the following command to enable it:")
+        print(f"systemctl --user daemon-reload")
+        print(f"systemctl --user enable {service_name}")
+        print(f"systemctl --user restart {service_name}")
 
 
 def uninstall_systemd_service(directory: str):
     service_file = find_service_file(directory)
     service_name = os.path.splitext(os.path.basename(service_file))[0]
-    systemd_path = f"/etc/systemd/system/{service_name}.service"
+    cpaths = paths(service_name)
     os.system(f"systemctl stop {service_name}")
     os.system(f"systemctl disable {service_name}")
-    os.system(f"rm {systemd_path}")
-    os.system(f"rm -rf /opt/{service_name}")
+    os.system(f"rm {cpaths['service']}")
+    os.system(f"rm -rf {cpaths['files']}")
     os.system("systemctl daemon-reload")
     print(f"Systemd service '{service_name}' uninstalled successfully.")
-    sys.exit(0)
+
+def uninstall_systemd_user_service(directory: str):
+    service_file = find_service_file(directory)
+    service_name = os.path.splitext(os.path.basename(service_file))[0]
+    cpaths = paths(service_name)
+    os.system(f"rm {cpaths['service']}")
+    os.system(f"rm -rf {cpaths['files']}")
+    print(f"Systemd user service '{service_name}' uninstalled successfully.")
+
 
 
 def issudo():
@@ -80,7 +114,12 @@ if __name__ == "__main__":
     issudo()
 
     directory = args.directory
+    user_directory = directory + "/user"
     if args.uninstall:
         uninstall_systemd_service(directory)
+        if os.path.exists(user_directory):
+            uninstall_systemd_user_service(user_directory)
     ensure_810_led_installed()
     install_systemd_service(directory, args.enable)
+    if os.path.exists(user_directory):
+        install_systemd_user_service(user_directory, args.enable)
