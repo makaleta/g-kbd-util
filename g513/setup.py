@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 from time import sleep
 
 COLOR = "a04000"
@@ -15,16 +14,6 @@ MEM_TOTAL = int(os.popen("vmstat -SM -s | head -1 | sed 's/[^0-9]//g'").read().s
 
 def g513_led(command):
     os.system(f"g513-led {command}")
-
-
-def numlock_status():
-    num_lock_status = (
-        os.popen("xset -q | sed -n 's/^.*Num Lock:\s*\(\S*\).*$/\1/p'").read().strip()
-    )
-    if num_lock_status == "on":
-        g513_led("numeric 999999")
-    else:
-        g513_led("numeric 000000")
 
 
 def sysstats():

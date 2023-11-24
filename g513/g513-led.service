@@ -1,5 +1,5 @@
 [Unit]
-Description=Dim keyboard LEDs
+Description=G513 keyboard dimmer and usage visualiser
 
 [Service]
 Type=simple

@@ -1,0 +1,11 @@
+[Unit]
+Description=G513 simulated numlock led
+
+[Service]
+Type=simple
+ExecStart=/usr/local/etc/g513-led-usr/setup.py
+Restart=on-abnormal
+StandardOutput=journal
+
+[Install]
+WantedBy=gnome-session.target
