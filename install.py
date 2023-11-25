@@ -119,6 +119,7 @@ if __name__ == "__main__":
         uninstall_systemd_service(directory)
         if os.path.exists(user_directory):
             uninstall_systemd_user_service(user_directory)
+        exit(0)
     ensure_810_led_installed()
     install_systemd_service(directory, args.enable)
     if os.path.exists(user_directory):
