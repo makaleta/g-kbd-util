@@ -1,6 +1,6 @@
 # g-kbd-util
 
-services and scripts for g810-led startup/shutdown
+services and scripts for [g810-led](https://github.com/MatMoul/g810-led) startup/shutdown
 
 ### install
 run install.py as superuser eg .`# ./install.py g513 --enable` 
